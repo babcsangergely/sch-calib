@@ -19,13 +19,13 @@ cut = vid[:, 220:255, 70:140]
 
 
 img_array=np.array(np.array(cut[500],dtype="float")-cut[1],dtype="float")
-#img_array[img_array==0]=np.nan
-#plt.imshow(cut[500])
-#plt.show()
 
-#plt.imshow(img_array)  
+plt.imshow(cut[500])
+plt.show()
 
-#plt.show()
+plt.imshow(img_array)  
+
+plt.show()
 
 
 dif=0
@@ -47,9 +47,9 @@ for i in range (180*5):
 
 
 rotated = rotate(img_array, angle, reshape=True)
-#plt.imshow(rotated)
+plt.imshow(rotated)
 
-#plt.show()
+plt.show()
 print(rotated)
 print(angle)
 print (dif)
@@ -58,12 +58,12 @@ row_sums = np.sum(rotated, axis=1)
 counts = np.count_nonzero(rotated, axis=1)
 row_means = np.divide(row_sums, counts, out=np.full_like(row_sums, np.nan, dtype=float), where=counts!=0)
 rmc=row_means[10:-10]
-#plt.plot(rmc)
-#plt.show()
+plt.plot(rmc)
+plt.show()
 
 row_means_smooth = savgol_filter(rmc, window_length=9, polyorder=3)
-#plt.plot(row_means_smooth)
-#plt.show()
+plt.plot(row_means_smooth)
+plt.show()
 
 
 
