@@ -12,28 +12,25 @@ import sys
 import os
 
 
-vid, framerate, startframe = load_vid(1708, preset="gap1e",d_trigger=[0,1800])
-cut = vid[:, 230:260, 70:160]
-plt.imshow(np.array(cut[500],dtype="float"),vmin=0,vmax=130)
-plt.show()
-plt.imshow(np.array(np.array(cut[500],dtype="float")-cut[0],dtype="float"),vmin=-10,vmax=13, cmap="grey")
-plt.show()
+vid, framerate, startframe = load_vid(1708, preset="gap1e",d_trigger=[0,502])
+cut = vid[:, 220:255, 70:140]
 
 
 
 
 img_array=np.array(np.array(cut[500],dtype="float")-cut[0],dtype="float")
 #img_array[img_array==0]=np.nan
-plt.imshow(img_array, cmap='gray')  # 'gray' ensures it's shown correctly
-plt.axis('off')  # Hide axes
+plt.imshow(cut[500])
 plt.show()
-print(img_array.shape)
 
+plt.imshow(img_array)  
+
+plt.show()
 
 
 dif=0
 angle=0
-max=0
+max_val=0
 for i in range (180*5):
     rotated = rotate(img_array, i/5, reshape=True)  
     rows=rotated.shape[0]
@@ -42,20 +39,20 @@ for i in range (180*5):
     row_means = np.divide(row_sums, counts, out=np.full_like(row_sums, np.nan, dtype=float), where=counts!=0)
 
 
-    
-    if (np.max(row_means)-np.min(row_means)>dif):
-        dif=np.max(row_means)-np.min(row_means)
+    rmc=row_means[8:-9]
+    if (np.max(rmc)-np.min(rmc)>dif):
+        dif=np.max(rmc)-np.min(rmc)
         angle=i/5
-    if(np.max(row_means)>max):
+    if(np.max(rmc)>max_val):
         mangle=i/5
-        max=np.max(row_means)
-        line_row = np.argmax(row_means)
+        max_val=np.max(rmc)
+        line_row = np.argmax(rmc)
 
-print(row_means)
+
 
 rotated = rotate(img_array, angle, reshape=True)
-plt.imshow(rotated, cmap='gray')
-plt.axis('off')
+plt.imshow(rotated)
+
 plt.show()
 print(rotated)
 print(angle)
@@ -63,28 +60,30 @@ print (dif)
 rotated = rotate(img_array, mangle, reshape=True)
 plt.imshow(rotated, cmap='gray')
 plt.axhline(line_row, color='red')  # draw detected line
-plt.axis('off')
+
 plt.show()
-print(max)
+print("max",max_val)
 row_sums = np.sum(rotated, axis=1)
 counts = np.count_nonzero(rotated, axis=1)
 row_means = np.divide(row_sums, counts, out=np.full_like(row_sums, np.nan, dtype=float), where=counts!=0)
-plt.plot(row_means)
+rmc=row_means[8:-9]
+plt.plot(rmc)
 plt.show()
 
-row_means_smooth = savgol_filter(row_means, window_length=9, polyorder=3)
+row_means_smooth = savgol_filter(rmc, window_length=9, polyorder=3)
 plt.plot(row_means_smooth)
 plt.show()
 
-background=np.mean(row_means[:19])
+background=np.mean(rmc[:20])
 
 
-density=np.zeros(len(row_means)+1)
+density=np.zeros(len(rmc)+1)
 pixel_length=0.11/1000  # pixel size in meters
 m= 0.021200478544405908
 b=-background*m
-for i in range (len(row_means)):
-    density[i+1]=density[i]+ (m * row_means[i] + b) * pixel_length
+for i in range (len(rmc)):
+    density[i+1]=density[i]+ (m * rmc[i] + b) * pixel_length
+print(density)
 plt.plot(density)
 plt.ylabel('Density (kg/m^3)')
 plt.show()
