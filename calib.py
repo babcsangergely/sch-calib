@@ -3,13 +3,26 @@ from PIL import Image
 import numpy as np
 from scipy.ndimage import rotate
 from scipy.signal import savgol_filter
+import glob
+from skimage.transform import resize
+from panorama import outdata, load_vid, loadfile
+import pickle
+from scipy import ndimage
+import sys
+import os
 
-# Load the image
-img = Image.open('Figure 2025-09-09 151438.png').convert('L')  # 'L' = grayscale
-# Convert image to a NumPy array
-img_array = np.array(img).astype(np.float32)
-#img_array=img_array[8:29,10:45]
-img_array=img_array[200:400,300:600]
+
+vid, framerate, startframe = load_vid(1708, preset="gap1e",d_trigger=[0,1800])
+cut = vid[:, 230:260, 70:160]
+plt.imshow(np.array(cut[500],dtype="float"),vmin=0,vmax=130)
+plt.show()
+plt.imshow(np.array(np.array(cut[500],dtype="float")-cut[0],dtype="float"),vmin=-10,vmax=13, cmap="grey")
+plt.show()
+
+
+
+
+img_array=np.array(np.array(cut[500],dtype="float")-cut[0],dtype="float")
 #img_array[img_array==0]=np.nan
 plt.imshow(img_array, cmap='gray')  # 'gray' ensures it's shown correctly
 plt.axis('off')  # Hide axes
